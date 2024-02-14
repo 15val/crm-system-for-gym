@@ -22,25 +22,27 @@ public class UserService {
 		return userRepository.findById(id).orElse(null);
 	}
 
-	public User createUser(User user) {
-		return userRepository.save(user);
+	public User createUser() {
+		User user = new User();
+		user.setFirstName("John");
+		user.setLastName("Doe");
+		user.setUsername(generateUsername(user.getFirstName(), user.getLastName()));
+		user.setPassword(generatePassword());
+		user.setActive(true);
+		return user;
 	}
 
-	public User updateUser(Long id, User userDetails) {
+	public User updateUser(Long id) {
 		User user = userRepository.findById(id)
 				.orElseThrow(() -> new RuntimeException("User not found with id: " + id));
 
-		user.setFirstName(userDetails.getFirstName());
-		user.setLastName(userDetails.getLastName());
-		user.setUsername(userDetails.getUsername());
-		user.setPassword(userDetails.getPassword());
-		user.setActive(userDetails.isActive());
+		user.setActive(!user.isActive());
 
 		return user;
 	}
 
-	public void deleteUser(Long id) {
-		userRepository.deleteById(id);
+	public Long deleteUser(Long userId) {
+		return userId;
 	}
 
 	private String generateUsername(String firstName, String lastName) {

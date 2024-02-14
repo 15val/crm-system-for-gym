@@ -6,5 +6,5 @@ import org.springframework.stereotype.Component;
 
 @Component
 public interface TrainerRepository extends JpaRepository<Trainer, Long> {
-
+	Trainer findByUserId(Long userId);
 }

@@ -6,9 +6,6 @@ import com.epam.gymcrm.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Random;
-import java.util.function.Predicate;
-
 @Service
 public class TrainerService {
 	private final TrainerRepository trainerRepository;
@@ -30,7 +27,7 @@ public class TrainerService {
 		return trainerRepository.findById(trainerId).orElse(null);
 	}
 
-	public Long deleteTrainer(Long traineeId) {
+	public Long deleteTrainer(Long trainerId) {
 		throw new UnsupportedOperationException("Not allowed to delete trainer");
 	}
 }
