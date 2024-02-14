@@ -23,6 +23,7 @@ public class UserService {
 	}
 
 	public User createUser() {
+		System.out.println("entered create user");
 		User user = new User();
 		user.setFirstName("John");
 		user.setLastName("Doe");

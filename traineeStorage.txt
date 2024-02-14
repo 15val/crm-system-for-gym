@@ -1,0 +1,1 @@
+1,Trainee(id=1, dateOfBirth=2000-01-01, address=xxx, userId=1)

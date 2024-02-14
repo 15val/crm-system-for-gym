@@ -8,12 +8,14 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 
 @Data
 @Entity
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+
 public class User {
 
 	@Id
@@ -24,5 +26,6 @@ public class User {
 	private String username;
 	private String password;
 	private boolean isActive;
+
 
 }
