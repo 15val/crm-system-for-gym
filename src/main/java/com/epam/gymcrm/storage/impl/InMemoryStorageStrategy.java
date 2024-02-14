@@ -22,8 +22,10 @@ import java.util.Set;
 
 @Component
 public class InMemoryStorageStrategy<T> implements StorageStrategy<T> {
-	private final Map<Long, T> storage = new HashMap<>();
 	private final Map<Long, T> userStorage = new HashMap<>();
+	private final Map<Long, T> trainerStorage = new HashMap<>();
+	private final Map<Long, T> trainingStorage = new HashMap<>();
+	private final Map<Long, T> traineeStorage = new HashMap<>();
 	private final DataFileManager<T> dataFileManager;
 	Set<Class<?>> allowedTypes;
 	private final TraineeService traineeService;
@@ -31,7 +33,9 @@ public class InMemoryStorageStrategy<T> implements StorageStrategy<T> {
 	private final TrainingService trainingService;
 	private final UserService userService;
 	private final String userStorageFilePath = "userStorage.txt";
-
+	private final String trainerStorageFilePath = "trainerStorage.txt";
+	private final String trainingStorageFilePath = "trainingStorage.txt";
+	private final String traineeStorageFilePath = "traineeStorage.txt";
 	@Autowired
 	public InMemoryStorageStrategy(DataFileManager<T> dataFileManager, Set<Class<?>> allowedTypes, UserService userService, TrainingService trainingService, TrainerService trainerService, TraineeService traineeService) {
 		this.traineeService = traineeService;
@@ -41,8 +45,10 @@ public class InMemoryStorageStrategy<T> implements StorageStrategy<T> {
 		this.dataFileManager = dataFileManager;
 
 		try {
-			this.storage.putAll(dataFileManager.readDataFromFile());
 			this.userStorage.putAll(dataFileManager.readDataFromFile(userStorageFilePath));
+			this.trainerStorage.putAll(dataFileManager.readDataFromFile(trainerStorageFilePath));
+			this.trainingStorage.putAll(dataFileManager.readDataFromFile(trainingStorageFilePath));
+			this.traineeStorage.putAll(dataFileManager.readDataFromFile(traineeStorageFilePath));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -59,42 +65,54 @@ public class InMemoryStorageStrategy<T> implements StorageStrategy<T> {
 		if (!allowedTypes.contains(data.getClass())) {
 			throw new IllegalArgumentException("Data type not allowed");
 		}
-		T result = null;
-		User user;
-		if (data instanceof Trainee) {
-			user = userService.createUser();
-			userStorage.put(user.getId(), (T) user);
-			((Trainee) data).setUserId(user.getId());
-			result = (T) traineeService.createTrainee((Trainee) data);
-		} else if (data instanceof Trainer) {
-			user = userService.createUser();
-			userStorage.put(user.getId(), (T) user);
-			((Trainer) data).setUserId(user.getId());
-			result = (T) trainerService.createTrainer((Trainer) data);
-		} else if (data instanceof Training) {
-			result = (T) trainingService.createTraining((Training) data);
-		}
-		storage.put(id, result);
 		try {
-			dataFileManager.writeDataToFile(userStorage, userStorageFilePath);
-			dataFileManager.writeDataToFile(storage);
+			T result;
+			User user;
+			if (data instanceof Trainee) {
+				user = userService.createUser();
+				userStorage.put(user.getId(), (T) user);
+				((Trainee) data).setUserId(user.getId());
+				result = (T) traineeService.createTrainee((Trainee) data);
+				traineeStorage.put(id, result);
+				dataFileManager.writeDataToFile(userStorage, userStorageFilePath);
+				dataFileManager.writeDataToFile(traineeStorage,traineeStorageFilePath);
+			} else if (data instanceof Trainer) {
+				user = userService.createUser();
+				userStorage.put(user.getId(), (T) user);
+				((Trainer) data).setUserId(user.getId());
+				result = (T) trainerService.createTrainer((Trainer) data);
+				trainerStorage.put(id, result);
+				dataFileManager.writeDataToFile(userStorage, userStorageFilePath);
+				dataFileManager.writeDataToFile(trainerStorage,trainerStorageFilePath);
+			} else if (data instanceof Training) {
+				result = (T) trainingService.createTraining((Training) data);
+				trainingStorage.put(id, result);
+				dataFileManager.writeDataToFile(trainingStorage,trainingStorageFilePath);
+			}
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
 	@Override
-	public T findById(Long id) {
-		T data = storage.get(id);
-		if (data!=null) {
-			if (data instanceof Trainee) {
+	public T findById(Long id, Class<T> classType) {
+		if (classType.equals(Trainee.class)) {
+			T data = traineeStorage.get(id);
+			if (data == null) {
 				return (T) traineeService.getTraineeById(id);
-			} else if (data instanceof Trainer) {
+			}
+		} else if (classType.equals(Trainer.class)) {
+			T data = trainerStorage.get(id);
+			if (data == null) {
 				return (T) trainerService.getTrainerById(id);
-			} else if (data instanceof Training) {
+			}
+		} else if (classType.equals(Training.class)) {
+			T data = trainingStorage.get(id);
+			if (data == null) {
 				return (T) trainingService.getTrainingById(id);
 			}
 		}
-		throw new NoSuchElementException("Object not exists in storage");
+
+		throw new NoSuchElementException("Object does not exist in storage");
 	}
 
 	@Override
@@ -104,57 +122,50 @@ public class InMemoryStorageStrategy<T> implements StorageStrategy<T> {
 		}
 		try {
 			User user;
-			T result = null;
+			T result;
 			if (data instanceof Trainee) {
 				user = userService.updateUser(((Trainee) data).getId());
 				userStorage.put(user.getId(), (T) user);
 				((Trainee) data).setUserId(user.getId());
 				result = (T) traineeService.updateTrainee((Trainee) data);
+				traineeStorage.put(id, result);
+				dataFileManager.writeDataToFile(userStorage, userStorageFilePath);
+				dataFileManager.writeDataToFile(traineeStorage, traineeStorageFilePath);
 			} else if (data instanceof Trainer) {
 				user = userService.updateUser(((Trainer) data).getId());
 				userStorage.put(user.getId(), (T) user);
 				((Trainer) data).setUserId(user.getId());
 				result = (T) trainerService.updateTrainer((Trainer) data);
-			} else if (data instanceof Training) {
-				result = (T) trainingService.updateTraining((Training) data);
-			}
-			storage.put(id, result);
-			try {
-				dataFileManager.writeDataToFile(storage);
+				trainerStorage.put(id, result);
 				dataFileManager.writeDataToFile(userStorage, userStorageFilePath);
-			} catch (IOException e) {
-				e.printStackTrace();
+				dataFileManager.writeDataToFile(trainerStorage,trainerStorageFilePath);
+			} else if (data instanceof Training) {
+				throw new UnsupportedOperationException("Training updating is not supported");
 			}
 		}
-		catch (UnsupportedOperationException e){
+		catch (UnsupportedOperationException | IOException e){
 			e.printStackTrace();
 		}
 	}
 
 	@Override
-	public void delete(Long id) {
-		T data = findById(id);
-		if (data == null) {
-			throw new NoSuchElementException("Object not exists in storage");
-		}
+	public void delete(Long id, Class<T> classType) {
 		try {
-			if (data instanceof Trainee) {
+			if (classType.equals(Trainee.class)) {
+				T data = traineeStorage.get(id);
+				if (data == null) {
+					throw new NoSuchElementException("Object does not exist in storage");
+				}
 				userStorage.remove(userService.deleteUser(((Trainee) data).getUserId()));
-				id = traineeService.deleteTrainee(id);
-			} else if (data instanceof Trainer) {
-				id = trainerService.deleteTrainer(id);
-			} else if (data instanceof Training) {
-				id = trainingService.deleteTraining(id);
-			}
-			storage.remove(id);
-			try {
-				dataFileManager.writeDataToFile(storage);
+				traineeStorage.remove(id);
 				dataFileManager.writeDataToFile(userStorage, userStorageFilePath);
-			} catch (IOException e) {
-				e.printStackTrace();
+				dataFileManager.writeDataToFile(traineeStorage, traineeStorageFilePath);
+			}
+			else {
+				throw new UnsupportedOperationException(classType.getName() + " deleting is not supported");
 			}
 		}
-		catch (UnsupportedOperationException e){
+		catch (UnsupportedOperationException | IOException e){
 			e.printStackTrace();
 		}
 	}
