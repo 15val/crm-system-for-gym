@@ -6,18 +6,13 @@ import com.epam.gymcrm.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Random;
-import java.util.function.Predicate;
-
 @Service
 public class TraineeService {
 	private final TraineeRepository traineeRepository;
-	private final UserRepository userRepository;
 
 	@Autowired
-	public TraineeService(TraineeRepository traineeRepository, UserRepository userRepository) {
+	public TraineeService(TraineeRepository traineeRepository) {
 		this.traineeRepository = traineeRepository;
-		this.userRepository = userRepository;
 	}
 
 	public Trainee createTrainee(Trainee trainee) {

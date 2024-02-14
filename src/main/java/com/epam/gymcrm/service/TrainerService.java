@@ -12,11 +12,9 @@ import java.util.function.Predicate;
 @Service
 public class TrainerService {
 	private final TrainerRepository trainerRepository;
-	private final UserRepository userRepository;
 
 	@Autowired
-	public TrainerService(TrainerRepository trainerRepository, UserRepository userRepository) {
-		this.userRepository = userRepository;
+	public TrainerService(TrainerRepository trainerRepository) {
 		this.trainerRepository = trainerRepository;
 	}
 
