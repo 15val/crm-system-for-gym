@@ -1,0 +1,1 @@
+1,Trainer(id=1, specialization=xxx, userId=1)

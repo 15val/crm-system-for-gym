@@ -79,7 +79,7 @@ public class InMemoryStorageStrategyTest <T> {
 		when(mockUserService.createUser()).thenReturn(new User(1L, null, null, null, null, true)); // assuming User creation returns User with ID 2
 		when(mockTraineeService.createTrainee(any(Trainee.class))).thenReturn(trainee);
 		when(mockDataFileManager.writeDataToFile(anyMap(), anyString())).thenCallRealMethod();
-		//???when(mockDataFileManager.readDataFromFile(anyString())).thenCallRealMethod();
+
 		// Act
 		inMemoryStorageStrategy.save(1L, (T) trainee);
 
@@ -87,41 +87,58 @@ public class InMemoryStorageStrategyTest <T> {
 		assertNotNull(inMemoryStorageStrategy.findById(1L, (Class<T>) Trainee.class));
 	}
 
-/*	@Test
-	public void saveTrainerTest() {
-		// Arrange
+	@Test
+		public void saveTrainerTest() throws IOException {
+			// Arrange
 		Trainer trainer = new Trainer();
-		when(mockUserService.createUser()).thenReturn(new User(2L)); // assuming User creation returns User with ID 2
+		trainer.setId(1L);
+		trainer.setSpecialization("xxx");
+		trainer.setUserId(1L);
+		when(mockUserService.createUser()).thenReturn(new User(1L, null, null, null, null, true)); // assuming User creation returns User with ID 2
 		when(mockTrainerService.createTrainer(any(Trainer.class))).thenReturn(trainer);
+		when(mockDataFileManager.writeDataToFile(anyMap(), anyString())).thenCallRealMethod();
 
 		// Act
-		inMemoryStorageStrategy.save(2L, trainer);
+		inMemoryStorageStrategy.save(1L, (T) trainer);
 
 		// Assert
-		assertNotNull(inMemoryStorageStrategy.findById(2L, Trainer.class));
+		assertNotNull(inMemoryStorageStrategy.findById(1L, (Class<T>)Trainer.class));
 	}
 
 	@Test
-	public void saveTrainingTest() {
+	public void saveTrainingTest() throws IOException {
 		// Arrange
 		Training training = new Training();
+		training.setId(1L);
+		training.setTraineeId(1L);
+		training.setTrainerId(1L);
 		when(mockTrainingService.createTraining(any(Training.class))).thenReturn(training);
+		when(mockDataFileManager.writeDataToFile(anyMap(), anyString())).thenCallRealMethod();
 
 		// Act
-		inMemoryStorageStrategy.save(3L, training);
+		inMemoryStorageStrategy.save(1L, (T) training);
 
 		// Assert
-		assertNotNull(inMemoryStorageStrategy.findById(3L, Training.class));
+		assertNotNull(inMemoryStorageStrategy.findById(1L, (Class<T>) Training.class));
 	}
 
 	@Test
-	public void findByIdTraineeTest() {
+	public void findByIdTraineeTest() throws IOException {
 		// Arrange
 		Trainee trainee = new Trainee();
-		inMemoryStorageStrategy.save(4L, trainee);
+		trainee.setId(1L);
+		trainee.setAddress("xxx");
+		trainee.setDateOfBirth(LocalDate.of(2000, 1, 1));
+		trainee.setUserId(1L);
+		when(mockUserService.createUser()).thenReturn(new User(1L, null, null, null, null, true)); // assuming User creation returns User with ID 2
+		when(mockTraineeService.createTrainee(any(Trainee.class))).thenReturn(trainee);
+		when(mockDataFileManager.writeDataToFile(anyMap(), anyString())).thenCallRealMethod();
 
 		// Act
-		Trainee foundTrainee = inMemoryStorageStrategy.findById(4L, Trainee.class);
+		inMemoryStorageStrategy.save(1L, (T) trainee);
+
+		// Act
+		Trainee foundTrainee = (Trainee) inMemoryStorageStrategy.findById(1L, (Class<T>) Trainee.class);
 
 		// Assert
 		assertNotNull(foundTrainee);
@@ -130,53 +147,36 @@ public class InMemoryStorageStrategyTest <T> {
 	@Test(expected = NoSuchElementException.class)
 	public void findByIdNonExistentObjectTest() {
 		// Act
-		inMemoryStorageStrategy.findById(999L, Trainer.class);
+		inMemoryStorageStrategy.findById(999L, (Class<T>) Trainer.class);
 	}
 
 	@Test
-	public void updateTraineeTest() {
+	public void updateTraineeTest() throws IOException {
 		// Arrange
 		Trainee trainee = new Trainee();
-		inMemoryStorageStrategy.save(5L, trainee);
+		trainee.setId(1L);
+		trainee.setAddress("xxx");
+		trainee.setDateOfBirth(LocalDate.of(2000, 1, 1));
+		trainee.setUserId(1L);
+		when(mockUserService.updateUser(1L)).thenReturn(new User(1L, null, null, null, null, false)); // assuming User creation returns User with ID 2
+
+		when(mockTraineeService.updateTrainee(any(Trainee.class))).thenReturn(trainee);
+		when(mockDataFileManager.writeDataToFile(anyMap(), anyString())).thenCallRealMethod();
 
 		// Act
-		trainee.setName("Updated Name");
-		inMemoryStorageStrategy.update(5L, trainee);
+		inMemoryStorageStrategy.update(1L, (T) trainee);
 
 		// Assert
-		assertEquals("Updated Name", ((Trainee) inMemoryStorageStrategy.findById(5L, Trainee.class)).getName());
+		assertEquals(1L, ((Trainee) inMemoryStorageStrategy.findById(1L, (Class<T>) Trainee.class)).getUserId());
 	}
 
-	@Test(expected = UnsupportedOperationException.class)
-	public void updateTrainingTest() {
-		// Arrange
-		Training training = new Training();
-		inMemoryStorageStrategy.save(6L, training);
+	@Test(expected = NoSuchElementException.class)
+	public void deleteTraineeTest()  {
 
 		// Act
-		inMemoryStorageStrategy.update(6L, training);
+		inMemoryStorageStrategy.delete(1L, (Class<T>) Trainee.class);
+
 	}
 
-	@Test
-	public void deleteTraineeTest() {
-		// Arrange
-		Trainee trainee = new Trainee();
-		inMemoryStorageStrategy.save(7L, trainee);
 
-		// Act
-		inMemoryStorageStrategy.delete(7L, Trainee.class);
-
-		// Assert
-		assertEquals(0, inMemoryStorageStrategy.findById(7L, Trainee.class).size());
-	}
-
-	@Test(expected = UnsupportedOperationException.class)
-	public void deleteTrainerTest() {
-		// Arrange
-		Trainer trainer = new Trainer();
-		inMemoryStorageStrategy.save(8L, trainer);
-
-		// Act
-		inMemoryStorageStrategy.delete(8L, Trainer.class);
-	}*/
 }

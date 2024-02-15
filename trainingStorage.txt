@@ -1,0 +1,1 @@
+1,Training(id=1, traineeId=1, trainerId=1, trainingName=null, trainingType=null, trainingDate=null, trainingDuration=0)

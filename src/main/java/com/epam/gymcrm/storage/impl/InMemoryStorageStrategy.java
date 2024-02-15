@@ -62,7 +62,7 @@ public class InMemoryStorageStrategy<T> implements StorageStrategy<T> {
 		if (!allowedTypes.contains(data.getClass())) {
 			throw new IllegalArgumentException("Data type not allowed");
 		}
-		System.out.println("allowed type");
+
 		try {
 			T result;
 			User user;
@@ -93,11 +93,11 @@ public class InMemoryStorageStrategy<T> implements StorageStrategy<T> {
 	}
 	@Override
 	public T findById(Long id, Class<T> classType) {
-		System.out.println("findById entered");
+
 		if (classType.equals(Trainee.class)) {
-			System.out.println("class equals trainee");
+
 			T data = traineeStorage.get(id);
-			System.out.println(data.toString());
+
 			if (data != null) {
 				return data;
 			}
