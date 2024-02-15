@@ -10,17 +10,16 @@ import com.epam.gymcrm.service.TrainingService;
 import com.epam.gymcrm.service.UserService;
 import com.epam.gymcrm.storage.DataFileManager;
 import com.epam.gymcrm.storage.StorageStrategy;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
 import java.io.IOException;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
 
+@Slf4j
 @Component
 public class InMemoryStorageStrategy<T> implements StorageStrategy<T> {
 	private final Map<Long, T> userStorage = new HashMap<>();
@@ -51,7 +50,7 @@ public class InMemoryStorageStrategy<T> implements StorageStrategy<T> {
 			this.trainingStorage.putAll(dataFileManager.readDataFromFile(trainingStorageFilePath));
 			this.traineeStorage.putAll(dataFileManager.readDataFromFile(traineeStorageFilePath));
 		} catch (IOException e) {
-			e.printStackTrace();
+			log.error("Error while initializing storage: {}", e.getMessage());
 		}
 
 	}
@@ -60,6 +59,7 @@ public class InMemoryStorageStrategy<T> implements StorageStrategy<T> {
 	@Override
 	public void save(Long id, T data) {
 		if (!allowedTypes.contains(data.getClass())) {
+			log.error("Data type not allowed");
 			throw new IllegalArgumentException("Data type not allowed");
 		}
 
@@ -88,7 +88,7 @@ public class InMemoryStorageStrategy<T> implements StorageStrategy<T> {
 				dataFileManager.writeDataToFile(trainingStorage,trainingStorageFilePath);
 			}
 		} catch (IOException e) {
-			e.printStackTrace();
+			log.error("Error while saving data: {}", e.getMessage());
 		}
 	}
 	@Override
@@ -119,6 +119,7 @@ public class InMemoryStorageStrategy<T> implements StorageStrategy<T> {
 	@Override
 	public void update(Long id, T data) {
 		if (!allowedTypes.contains(data.getClass())) {
+			log.error("Data type not allowed");
 			throw new IllegalArgumentException("Data type not allowed");
 		}
 		try {
@@ -144,7 +145,7 @@ public class InMemoryStorageStrategy<T> implements StorageStrategy<T> {
 				throw new UnsupportedOperationException("Training updating is not supported");
 			}
 		} catch (UnsupportedOperationException | IOException e){
-			e.printStackTrace();
+			log.error("Error while updating data: {}", e.getMessage());
 		}
 	}
 
@@ -166,7 +167,7 @@ public class InMemoryStorageStrategy<T> implements StorageStrategy<T> {
 			}
 		}
 		catch (UnsupportedOperationException | IOException e){
-			e.printStackTrace();
+			log.error("Error while deleting data: {}", e.getMessage());
 		}
 	}
 }

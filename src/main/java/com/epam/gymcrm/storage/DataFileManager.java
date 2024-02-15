@@ -3,6 +3,7 @@ package com.epam.gymcrm.storage;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.BufferedReader;
@@ -14,6 +15,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+@Slf4j
 public class DataFileManager<T> {
 	private final ObjectMapper objectMapper = new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT);
 	private final String filePath;
@@ -39,6 +41,9 @@ public class DataFileManager<T> {
 				}
 			}
 		}
+	 	catch (IOException e){
+			log.error("Error while reading data from file: {}", e.getMessage());
+		}
 		return dataMap;
 	}
 
@@ -52,9 +57,11 @@ public class DataFileManager<T> {
 			}
 			return true;
 		}
-		catch (Exception e) {
-			return false;
+	 	catch (IOException e) {
+		log.error("Error while writing data to file: {}", e.getMessage());
+
 		}
+		return false;
 	}
 
 }
