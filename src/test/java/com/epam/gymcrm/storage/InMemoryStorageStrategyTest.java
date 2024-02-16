@@ -14,25 +14,19 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.invocation.InvocationOnMock;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.mockito.stubbing.Answer;
-
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
-
 import static org.junit.Assert.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -76,7 +70,7 @@ public class InMemoryStorageStrategyTest <T> {
 		trainee.setAddress("xxx");
 		trainee.setDateOfBirth(LocalDate.of(2000, 1, 1));
 		trainee.setUserId(1L);
-		when(mockUserService.createUser()).thenReturn(new User(1L, null, null, null, null, true)); // assuming User creation returns User with ID 2
+		when(mockUserService.createUser()).thenReturn(new User(1L, null, null, null, null, true));
 		when(mockTraineeService.createTrainee(any(Trainee.class))).thenReturn(trainee);
 		when(mockDataFileManager.writeDataToFile(anyMap(), anyString())).thenCallRealMethod();
 
@@ -94,7 +88,7 @@ public class InMemoryStorageStrategyTest <T> {
 		trainer.setId(1L);
 		trainer.setSpecialization("xxx");
 		trainer.setUserId(1L);
-		when(mockUserService.createUser()).thenReturn(new User(1L, null, null, null, null, true)); // assuming User creation returns User with ID 2
+		when(mockUserService.createUser()).thenReturn(new User(1L, null, null, null, null, true));
 		when(mockTrainerService.createTrainer(any(Trainer.class))).thenReturn(trainer);
 		when(mockDataFileManager.writeDataToFile(anyMap(), anyString())).thenCallRealMethod();
 
@@ -130,14 +124,12 @@ public class InMemoryStorageStrategyTest <T> {
 		trainee.setAddress("xxx");
 		trainee.setDateOfBirth(LocalDate.of(2000, 1, 1));
 		trainee.setUserId(1L);
-		when(mockUserService.createUser()).thenReturn(new User(1L, null, null, null, null, true)); // assuming User creation returns User with ID 2
+		when(mockUserService.createUser()).thenReturn(new User(1L, null, null, null, null, true));
 		when(mockTraineeService.createTrainee(any(Trainee.class))).thenReturn(trainee);
 		when(mockDataFileManager.writeDataToFile(anyMap(), anyString())).thenCallRealMethod();
 
 		// Act
 		inMemoryStorageStrategy.save(1L, (T) trainee);
-
-		// Act
 		Trainee foundTrainee = (Trainee) inMemoryStorageStrategy.findById(1L, (Class<T>) Trainee.class);
 
 		// Assert
@@ -158,7 +150,7 @@ public class InMemoryStorageStrategyTest <T> {
 		trainee.setAddress("xxx");
 		trainee.setDateOfBirth(LocalDate.of(2000, 1, 1));
 		trainee.setUserId(1L);
-		when(mockUserService.updateUser(1L)).thenReturn(new User(1L, null, null, null, null, false)); // assuming User creation returns User with ID 2
+		when(mockUserService.updateUser(1L)).thenReturn(new User(1L, null, null, null, null, false));
 
 		when(mockTraineeService.updateTrainee(any(Trainee.class))).thenReturn(trainee);
 		when(mockDataFileManager.writeDataToFile(anyMap(), anyString())).thenCallRealMethod();
